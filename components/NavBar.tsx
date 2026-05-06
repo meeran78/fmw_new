@@ -125,12 +125,12 @@ const NavBar = () => {
                 </Link>
               </li>
               <li>
-                <Link href="/" className="text-sm font-medium">
+                <Link href="/services-repair" className="text-sm font-medium">
                   Services & Repair
                 </Link>
               </li>
               <li>
-                <Link href="/" className="text-sm font-medium">
+                <Link href="/pricing" className="text-sm font-medium">
                   Pricing
                 </Link>
               </li>
