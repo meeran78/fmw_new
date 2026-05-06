@@ -27,8 +27,8 @@ export async function POST(request: Request) {
     cookies().set(AUTH_COOKIE_NAME, session.secret, {
       path: "/",
       httpOnly: true,
-      sameSite: "strict",
-      secure: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 24 * 30,
     });
 

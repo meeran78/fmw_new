@@ -27,12 +27,14 @@ import { loginMutationFn } from "@/lib/fetcher";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
 import { Loader } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const LoginDialog = () => {
   const { open, onClose } = useLoginDialog();
   const { onOpen } = useRegisterDialog();
 
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const { mutate, isPending } = useMutation({
     mutationFn: loginMutationFn,
@@ -48,10 +50,9 @@ const LoginDialog = () => {
 
   const onSubmit = (values: z.infer<typeof loginSchema>) => {
     mutate(values, {
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: ["currentUser"],
-        });
+      onSuccess: async () => {
+        await queryClient.refetchQueries({ queryKey: ["currentUser"] });
+        router.refresh();
 
         toast({
           title: "Login Successfully",
