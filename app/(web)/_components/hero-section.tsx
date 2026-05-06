@@ -54,6 +54,7 @@ const HeroSection = () => {
               scale-100 md:scale-100 lg:scale-110"
               width={800}
               height={500}
+              priority={true}
             />
           </div>
         </div>

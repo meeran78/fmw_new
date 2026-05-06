@@ -70,13 +70,25 @@ const HeroFilter = () => {
 
   const handleSearch = () => {
     const params = new URLSearchParams();
-    Object.entries(selectedFilters).forEach(([key, value]) => {
-      if (value) {
-        params.append(key, value);
-      }
+    const { year_min, year_max, ...rest } = selectedFilters;
+
+    Object.entries(rest).forEach(([key, value]) => {
+      if (value) params.append(key, value);
     });
-    console.log(params);
-    router.push(`/search/${params.toString()}`);
+
+    if (
+      year_min &&
+      year_max &&
+      Number(year_min) > 0 &&
+      Number(year_max) > 0 &&
+      Number(year_min) <= Number(year_max)
+    ) {
+      params.append("year_min", year_min);
+      params.append("year_max", year_max);
+    }
+
+    const qs = params.toString();
+    router.push(qs ? `/search?${qs}` : "/search");
   };
 
   return (

@@ -1,14 +1,22 @@
 import { APP_CONFIG } from "@/lib/app-config";
-import { createSessionClient } from "@/lib/appwrite";
-import { NextRequest, NextResponse } from "next/server";
+import { createSessionClient, getLoggedInUser } from "@/lib/appwrite";
+import { NextResponse } from "next/server";
 import { Query } from "node-appwrite";
 
 export const dynamic = "force-dynamic";
 
-export const GET = async (req: NextRequest) => {
+export const GET = async () => {
   try {
-    const { account, databases } = await createSessionClient();
-    const user = await account.get();
+    const user = await getLoggedInUser();
+    if (!user) {
+      return NextResponse.json({
+        message: "Not authenticated",
+        user: null,
+        shop: null,
+      });
+    }
+
+    const { databases } = await createSessionClient();
 
     const shopDocuments = await databases.listDocuments(
       APP_CONFIG.APPWRITE.DATABASE_ID,
@@ -23,15 +31,10 @@ export const GET = async (req: NextRequest) => {
       user,
       shop,
     });
-  } catch (error: any) {
-    console.log(error);
-    return NextResponse.json(
-      {
-        message: error.message || "Internal Server Error",
-      },
-      {
-        status: 500,
-      }
-    );
+  } catch (error: unknown) {
+    console.error(error);
+    const message =
+      error instanceof Error ? error.message : "Internal Server Error";
+    return NextResponse.json({ message }, { status: 500 });
   }
 };

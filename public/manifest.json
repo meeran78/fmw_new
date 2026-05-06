@@ -1,0 +1,16 @@
+{
+  "name": "Falah Motors",
+  "short_name": "Falah Motors",
+  "description": "Falah Motors is a car dealership that sells new and used cars.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f3f0fa",
+  "theme_color": "#7c3aed",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ]
+}
