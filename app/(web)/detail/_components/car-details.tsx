@@ -1,5 +1,4 @@
 import { ListingType } from "@/@types/api.type";
-import ChatSellerButton from "@/components/ChatSellerButton";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -240,15 +239,6 @@ const CarDetails = ({
                   ))}
                 </ul>
               </div>
-            </div>
-
-            <Separator />
-            <div className="my-4 w-full max-w-[170px]">
-              <ChatSellerButton
-                displayTitle={listing?.displayTitle}
-                shopOwnerUserId={listing?.shop?.userId || ""}
-                shopName={listing?.shop?.shopName || ""}
-              />
             </div>
           </CardContent>
         </Card>

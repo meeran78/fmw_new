@@ -4,14 +4,14 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader, MessageSquareText } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { createSendBirdUser, createGroupChannel } from "@/lib/sendbird";
-import useLogin from "@/hooks/use-login-dialog";
+import useLoginDialog from "@/hooks/use-login-dialog";
 import useCurrentUser from "@/hooks/api/use-current-user";
+import { toast } from "@/hooks/use-toast";
 
 interface ChatSellerButtonProps {
-  displayTitle: string;
-  shopOwnerUserId: string;
-  shopName: string;
+  displayTitle?: string;
+  shopOwnerUserId?: string;
+  shopName?: string;
 }
 
 const ChatSellerButton = ({
@@ -20,64 +20,99 @@ const ChatSellerButton = ({
   displayTitle,
 }: ChatSellerButtonProps) => {
   const router = useRouter();
-  const { onOpen } = useLogin();
+  const { onOpen } = useLoginDialog();
   const { data: userData, isPending } = useCurrentUser();
   const user = userData?.user;
 
   const [isLoading, setIsLoading] = useState(false);
 
+  const sellerMissing = !shopOwnerUserId?.trim() || !shopName?.trim();
+  const listingMissing = !displayTitle?.trim();
+
   const handleStartChat = async () => {
     if (!user) {
-      onOpen(); // Open the login popup if the user is not logged in
+      onOpen();
       return;
     }
+
+    const oid = shopOwnerUserId?.trim();
+    const nm = shopName?.trim();
+    const ttl = displayTitle?.trim();
+    if (!oid || !nm || !ttl) {
+      toast({
+        title: "Chat unavailable",
+        description:
+          "This listing is missing seller details. Try refreshing the page.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (oid === user.$id) {
+      toast({
+        title: "Chat unavailable",
+        description: "You cannot message yourself about your own listing.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      // Step 1: Create the customer user
-      try {
-        await createSendBirdUser({
-          userId: user.$id,
-          nickname: user.name,
-        });
-      } catch (error) {
-        console.error("Error creating customer SendBird user:", error);
+      const res = await fetch("/api/chat/start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          shopOwnerUserId: oid,
+          shopName: nm,
+          displayTitle: ttl,
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(
+          typeof data.error === "string" ? data.error : `Request failed (${res.status})`
+        );
       }
 
-      // Step 2: Create the seller user
-      try {
-        await createSendBirdUser({
-          userId: shopOwnerUserId,
-          nickname: shopName,
-        });
-      } catch (error) {
-        console.error("Error creating seller SendBird user:", error);
+      const channelUrl = data.channelUrl as string | undefined;
+      if (!channelUrl) {
+        throw new Error("No conversation URL returned");
       }
 
-      // Step 4: Create a channel between the customer and seller
-      const channelName = `${shopName}-${displayTitle}`;
-      const channel = await createGroupChannel(channelName, [
-        user.$id,
-        shopOwnerUserId,
-      ]);
-      router.push(`/profile-messages?channelUrl=${channel.channel_url}`);
-      setIsLoading(false);
-    } catch (error) {
-      console.error("Error starting chat:", error);
+      router.push(
+        `/profile-messages?channelUrl=${encodeURIComponent(channelUrl)}`
+      );
+    } catch (error: unknown) {
+      const description =
+        error instanceof Error && error.message
+          ? error.message
+          : "Could not open chat. Check Sendbird configuration and try again.";
+      toast({
+        title: "Could not start chat",
+        description,
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
     }
   };
 
   return (
     <div>
-      <div className="mt-4">
+      <div>
         <Button
           variant="default"
           size="lg"
           className="w-full
              border-primary text-white !gap-1 h-10 text-[15px]
               font-medium disabled:pointer-events-none"
-          disabled={isLoading || isPending}
+          disabled={
+            isLoading || isPending || sellerMissing || listingMissing
+          }
           onClick={handleStartChat}
         >
           {isLoading ? (

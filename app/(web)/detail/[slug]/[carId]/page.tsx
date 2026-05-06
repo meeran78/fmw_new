@@ -41,7 +41,7 @@ const CarDetail = ({
 
           {/* {Car DisplayTitle Section} */}
           <CarHeader
-            displayTitle={listing?.displayTitle}
+            displayTitle={listing?.displayTitle ?? ""}
             condition={listing?.condition}
             fuelType={listing?.fuelType}
             transmission={listing?.transmission}
@@ -63,11 +63,12 @@ const CarDetail = ({
             </div>
             <div>
               <ShopInfo
-                displayTitle={listing?.displayTitle}
-                price={listing?.price}
-                shopId={listing?.shopId}
+                displayTitle={listing?.displayTitle ?? ""}
+                price={listing?.price ?? 0}
+                shopId={listing?.shopId ?? ""}
                 shopName={listing?.shop?.shopName || ""}
                 shopOwnerUserId={listing?.shop?.userId || ""}
+                listingId={listing?.$id}
                 isPending={isPending || isError}
               />
             </div>

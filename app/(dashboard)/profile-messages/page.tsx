@@ -46,7 +46,7 @@ const ProfileMessages = () => {
                 <SendbirdProvider
                   appId={APP_CONFIG.SEND_BIRD.APP_ID}
                   userId={user.$id}
-                  //nickname={user.name}
+                  nickname={user.name || undefined}
                   colorSet={myColorSet}
                   allowProfileEdit={false}
                   isUserIdUsedForNickname={false}
@@ -55,8 +55,8 @@ const ProfileMessages = () => {
                     <GroupChannelList
                       allowProfileEdit={false}
                       selectedChannelUrl={selectedChannel || undefined}
-                      onChannelSelect={(channel: any) => {
-                        setSelectedChannel(channel?._url);
+                      onChannelSelect={(channel) => {
+                        setSelectedChannel(channel?.url ?? null);
                       }}
                       channelListQueryParams={{
                         includeEmpty: true,
@@ -64,7 +64,15 @@ const ProfileMessages = () => {
                       onChannelCreated={() => {}}
                       className="col-span-1"
                     />
-                    <GroupChannel channelUrl={selectedChannel || ""} />
+                    {selectedChannel ? (
+                      <GroupChannel channelUrl={selectedChannel} />
+                    ) : (
+                      <div
+                        className="flex flex-1 items-center justify-center border-l bg-muted/30 p-8 text-center text-sm text-muted-foreground"
+                      >
+                        Select a conversation or start one from a listing.
+                      </div>
+                    )}
                   </div>
                 </SendbirdProvider>
 

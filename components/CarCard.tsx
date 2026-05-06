@@ -27,7 +27,7 @@ const CarCard: React.FC<CarCardProps> = ({ listing, layout = "grid" }) => {
     description,
   } = listing;
 
-  const slug = createSlug(displayTitle);
+  const slug = createSlug(displayTitle ?? "");
   const conditionLabel = CAR_CONDITION_OPTIONS.find(
     (opt) => opt.value === condition
   )?.label;

@@ -6,8 +6,9 @@ export type LoginType = {
 export type RegisterType = {
   name: string;
   email: string;
-  shopName: string;
   password: string;
+  accountType: "buyer" | "seller";
+  shopName?: string;
 };
 
 export type ShopType = {
@@ -38,7 +39,7 @@ export type ListingType = {
   price: number;
   contactPhone: string;
   imageUrls: string[];
-  displayTitle: string;
+  displayTitle?: string;
   shopId: string;
   shop?: ShopType;
 };

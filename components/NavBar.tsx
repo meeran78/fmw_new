@@ -31,17 +31,18 @@ const NavBar = () => {
 
   const { data: userData, isPending: isLoading } = useCurrentUser();
   const user = userData?.user;
+  const hasShop = Boolean(userData?.shop);
+  /** Hide until loaded so buyers don't briefly see the seller CTA. */
+  const showSellCar = !isLoading && (!user || hasShop);
 
   const queryClient = useQueryClient();
 
   const { mutate, isPending } = useMutation({
     mutationFn: logoutMutationFn,
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.setQueryData(["currentUser"], null);
-
-      queryClient.invalidateQueries({
-        queryKey: ["currentUser"],
-      });
+      await queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+      router.refresh();
       router.push("/");
     },
     onError: () => {
@@ -57,6 +58,14 @@ const NavBar = () => {
       onLoginOpen();
       return;
     }
+    if (!hasShop) {
+      toast({
+        title: "Selling requires a seller account",
+        description:
+          "Register as a seller (with a shop name) or use another seller profile to list cars.",
+      });
+      return;
+    }
     router.push("/my-shop/add-listing");
   };
 
@@ -64,8 +73,20 @@ const NavBar = () => {
     mutate();
   }, [mutate]);
 
-  const hideSearchPathname = ["/", "/my-shop/add-listing", "/profile-messages"];
-  const hideNavPath = ["/my-shop", "/my-shop/add-listing", "/profile-messages"];
+  const hideSearchPathname = [
+    "/",
+    "/my-shop/add-listing",
+    "/profile-messages",
+    "/appointments",
+    "/my-shop/schedule",
+  ];
+  const hideNavPath = [
+    "/my-shop",
+    "/my-shop/add-listing",
+    "/profile-messages",
+    "/appointments",
+    "/my-shop/schedule",
+  ];
 
   return (
     <header
@@ -182,11 +203,28 @@ const NavBar = () => {
                   </Avatar>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56" align="end" forceMount>
+                  {hasShop ? (
+                    <>
+                      <DropdownMenuItem
+                        onClick={() => router.push("/my-shop")}
+                        className="!cursor-pointer"
+                      >
+                        My Shop
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => router.push("/my-shop/schedule")}
+                        className="!cursor-pointer"
+                      >
+                        Booking availability
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                    </>
+                  ) : null}
                   <DropdownMenuItem
-                    onClick={() => router.push("/my-shop")}
+                    onClick={() => router.push("/appointments")}
                     className="!cursor-pointer"
                   >
-                    My Shop
+                    My appointments
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
@@ -201,16 +239,18 @@ const NavBar = () => {
             </div>
           )}
 
-          <Button
-            size="default"
-            className="!bg-[#fea03c]
+          {showSellCar && (
+            <Button
+              size="default"
+              className="!bg-[#fea03c]
         !px-5 !h-10
         "
-            onClick={handleSell}
-          >
-            <Plus />
-            Sell Car
-          </Button>
+              onClick={handleSell}
+            >
+              <Plus />
+              Sell Car
+            </Button>
+          )}
         </div>
       </nav>
     </header>

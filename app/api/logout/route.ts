@@ -1,22 +1,35 @@
 import { AUTH_COOKIE_NAME } from "@/constants/server";
 import { createSessionClient } from "@/lib/appwrite";
 import { cookies } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export const POST = async (req: NextRequest) => {
+/** Match login cookie options so the browser reliably clears it on logout. */
+function clearAuthCookie() {
+  const cookieStore = cookies();
+  cookieStore.set(AUTH_COOKIE_NAME, "", {
+    path: "/",
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 0,
+  });
+}
+
+export const POST = async () => {
   try {
-    const { account } = await createSessionClient();
-    await account.deleteSession("current");
-    cookies().delete(AUTH_COOKIE_NAME);
+    try {
+      const { account } = await createSessionClient();
+      await account.deleteSession("current");
+    } catch {
+      // Missing / expired session or Appwrite error — still clear cookie locally.
+    }
+
+    clearAuthCookie();
+
     return NextResponse.json({ message: "Logout successful" });
-  } catch (error: any) {
-    return NextResponse.json(
-      {
-        error: error?.message || "Internal Server Error",
-      },
-      {
-        status: 500,
-      }
-    );
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Internal Server Error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 };

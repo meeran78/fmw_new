@@ -5,6 +5,7 @@ import ShopInfo from "@/components/shop/shop-info";
 import { getMyShopQueryFn } from "@/lib/fetcher";
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
+import Link from "next/link";
 
 const MyShop = () => {
   const { data: shopData, isPending } = useQuery({
@@ -22,7 +23,7 @@ const MyShop = () => {
                 grid grid-cols-1 items-stretch justify-stretch
                 md:grid-cols-[305px_1fr] gap-5"
         >
-          <div className="pt-1">
+          <div className="pt-1 space-y-3">
             <ShopInfo
               shopName={shop?.shopName}
               shopId={shop?.$id}
@@ -32,6 +33,14 @@ const MyShop = () => {
               shopOwnerUserId={user?.$id}
               isPending={isPending}
             />
+            {shop?.$id && (
+              <Link
+                href="/my-shop/schedule"
+                className="block text-center text-sm font-medium text-primary underline-offset-4 hover:underline"
+              >
+                Set booking availability (UTC)
+              </Link>
+            )}
           </div>
           <div className="pt-1">
             <AllListing listings={listings} isPending={isPending} />

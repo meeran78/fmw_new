@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { UserIcon } from "lucide-react";
 import ChatSellerButton from "@/components/ChatSellerButton";
+import { BookAppointmentButton } from "@/components/appointment/BookAppointmentButton";
 import { Avatar } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -14,6 +15,7 @@ interface PropsType {
   shopName: string;
   displayTitle: string;
   shopOwnerUserId: string;
+  listingId?: string;
   isPending: boolean;
 }
 const ShopInfo = ({
@@ -23,6 +25,7 @@ const ShopInfo = ({
   isPending,
   displayTitle,
   shopOwnerUserId,
+  listingId,
 }: PropsType) => {
   return (
     <div className="w-full">
@@ -98,14 +101,20 @@ const ShopInfo = ({
                 </div>
               </Link>
 
-              {/* {Chat Button } You can uncomment it it works */}
-              {/* <div className="mt-4">
+              <div className="mt-4 flex flex-col gap-2">
                 <ChatSellerButton
                   displayTitle={displayTitle}
                   shopName={shopName}
                   shopOwnerUserId={shopOwnerUserId}
                 />
-              </div> */}
+                <BookAppointmentButton
+                  listingId={listingId}
+                  sellerUserId={shopOwnerUserId}
+                  shopId={shopId}
+                  shopName={shopName}
+                  displayTitle={displayTitle}
+                />
+              </div>
             </CardContent>
           </Card>
 

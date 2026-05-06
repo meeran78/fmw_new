@@ -82,7 +82,8 @@ const LoginDialog = () => {
         <DialogHeader>
           <DialogTitle>Sign in to your account</DialogTitle>
           <DialogDescription>
-            Enter your email and password to login
+            Use the email and password from registration. Buyers can book seller
+            appointments; sellers manage listings and availability.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -139,7 +140,7 @@ const LoginDialog = () => {
         <div className="mt-2 flex items-center justify-center">
           <p className="text-sm text-muted-foreground">
             Dont't have an account?{" "}
-            <button className="!text-primary" onClick={handleRegisterOpen}>
+            <button type="button" className="!text-primary" onClick={handleRegisterOpen}>
               Registration
             </button>
           </p>
