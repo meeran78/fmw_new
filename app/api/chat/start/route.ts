@@ -45,6 +45,7 @@ export async function POST(req: NextRequest) {
     const channel = await createDistinctGroupChannel({
       name: channelName,
       userIds: [user.$id, shopOwnerUserId],
+      inviterUserId: user.$id,
     });
 
     return NextResponse.json({

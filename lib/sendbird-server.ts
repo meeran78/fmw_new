@@ -27,6 +27,17 @@ function getSendbirdCredentials() {
   return { appId, apiToken };
 }
 
+function isSendbirdUserMissing(err: unknown): boolean {
+  if (!axios.isAxiosError(err)) return false;
+  const ax = err as AxiosError<{ message?: string }>;
+  const status = ax.response?.status;
+  const msg = String(ax.response?.data?.message ?? "").toLowerCase();
+  if (status === 404) return true;
+  if (status === 400 && msg.includes("not found") && msg.includes("user"))
+    return true;
+  return false;
+}
+
 /** Ensure user exists in Sendbird (create or update nickname). */
 export async function ensureSendbirdUser(userId: string, nickname: string) {
   const { appId, apiToken } = getSendbirdCredentials();
@@ -37,44 +48,73 @@ export async function ensureSendbirdUser(userId: string, nickname: string) {
   };
   const safeNickname = nickname.trim().slice(0, 80) || userId;
 
-  try {
-    await axios.get(`${base}/${encodeURIComponent(userId)}`, {
-      headers: { "Api-Token": apiToken },
-    });
+  async function patchNickname() {
     await axios.put(
       `${base}/${encodeURIComponent(userId)}`,
       { nickname: safeNickname, profile_url: "" },
       { headers }
     );
+  }
+
+  try {
+    await axios.get(`${base}/${encodeURIComponent(userId)}`, {
+      headers: { "Api-Token": apiToken },
+    });
+    await patchNickname();
+    return;
   } catch (err) {
-    if (!axios.isAxiosError(err)) throw err;
-    const ax = err as AxiosError;
-    if (ax.response?.status === 404) {
-      try {
-        await axios.post(
-          base,
-          {
-            user_id: userId,
-            nickname: safeNickname,
-            profile_url: "",
-          },
-          { headers }
-        );
-        return;
-      } catch (postErr) {
-        throwSendbirdError(postErr);
-      }
+    if (!isSendbirdUserMissing(err)) {
+      throwSendbirdError(err);
     }
-    throwSendbirdError(err);
+
+    try {
+      await axios.post(
+        base,
+        {
+          user_id: userId,
+          nickname: safeNickname,
+          profile_url: "",
+        },
+        { headers }
+      );
+      return;
+    } catch (postErr) {
+      if (!axios.isAxiosError(postErr)) throw postErr;
+      const pmsg = String(
+        (postErr.response?.data as { message?: string })?.message ?? ""
+      ).toLowerCase();
+      const duplicate =
+        postErr.response?.status === 400 &&
+        (pmsg.includes("already") ||
+          pmsg.includes("exist") ||
+          pmsg.includes("duplicate"));
+      if (duplicate) {
+        try {
+          await patchNickname();
+        } catch {
+          /* user exists; nickname update optional */
+        }
+        return;
+      }
+      throwSendbirdError(postErr);
+    }
   }
 }
 
 export async function createDistinctGroupChannel(params: {
   name: string;
   userIds: string[];
+  /** Buyer who opened the chat — Sendbird uses this for `created_by` and invitation attribution (otherwise it stays null via Platform API). */
+  inviterUserId?: string;
 }) {
   if (params.userIds.length < 2) {
     throw new Error("Group channel requires at least two users");
+  }
+  if (
+    params.inviterUserId &&
+    !params.userIds.includes(params.inviterUserId)
+  ) {
+    throw new Error("inviterUserId must be one of userIds");
   }
   const { appId, apiToken } = getSendbirdCredentials();
   const url = `https://api-${appId}.sendbird.com/v3/group_channels`;
@@ -83,17 +123,18 @@ export async function createDistinctGroupChannel(params: {
     "Api-Token": apiToken,
   };
 
+  const body: Record<string, unknown> = {
+    name: params.name.slice(0, 190),
+    user_ids: params.userIds,
+    is_distinct: true,
+    custom_type: "listing_inquiry",
+  };
+  if (params.inviterUserId) {
+    body.inviter_id = params.inviterUserId;
+  }
+
   try {
-    const { data } = await axios.post(
-      url,
-      {
-        name: params.name.slice(0, 190),
-        user_ids: params.userIds,
-        is_distinct: true,
-        custom_type: "listing_inquiry",
-      },
-      { headers }
-    );
+    const { data } = await axios.post(url, body, { headers });
 
     const channelUrl =
       (data as { channel_url?: string }).channel_url ??

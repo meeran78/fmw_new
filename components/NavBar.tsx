@@ -185,10 +185,13 @@ const NavBar = () => {
           ) : (
             <div className="flex items-center space-x-2">
               <Button
+                type="button"
                 size="icon"
+                aria-label="Messages"
                 className="rounded-full shadow-sm !py-0
                   !bg-white !text-black
                     "
+                onClick={() => router.push("/profile-messages")}
               >
                 <MessageSquareText />
               </Button>
