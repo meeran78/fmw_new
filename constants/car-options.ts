@@ -118,8 +118,10 @@ export const CAR_COLOR_OPTIONS = [
 ];
 
 export const CAR_CONDITION_OPTIONS = [
-  { value: "BRAND_NEW", label: "Brand New" },
-  { value: "USED", label: "Used" },
+  { value: "EXCELLENT", label: "Excellent" },
+  { value: "VERY GOOD", label: "Very Good" },
+  { value: "GOOD", label: "Good" },
+  { value: "FAIR", label: "Fair" },
 ];
 
 export const CAR_FUELTYPE_OPTIONS = [
