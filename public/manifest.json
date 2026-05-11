@@ -1,7 +1,7 @@
 {
-  "name": "Falah Motors",
-  "short_name": "Falah Motors",
-  "description": "Falah Motors is a car dealership that sells new and used cars.",
+  "name": "AHM Auto",
+  "short_name": "AHM Auto",
+  "description": "AHM Auto is a car dealership that sells new and used cars.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f3f0fa",

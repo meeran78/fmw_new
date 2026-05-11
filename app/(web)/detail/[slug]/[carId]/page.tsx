@@ -29,7 +29,7 @@ const CarDetail = ({
   const listing = data?.listing as ListingType;
 
   const breadcrumbItems = [
-    { label: "Falah Motors", href: "/" },
+    { label: "AHM Auto", href: "/" },
     { label: "Cars", href: "/search" },
     { label: carName },
   ];

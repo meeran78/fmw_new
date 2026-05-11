@@ -11,9 +11,9 @@ import {
 } from "@/components/ui/card";
 
 export const metadata: Metadata = {
-  title: "Pricing | Falah Motors",
+  title: "Pricing | AHM Auto",
   description:
-    "Listing fees and packages — coming soon at Falah Motors.",
+    "Listing fees and packages — coming soon at AHM Auto.",
 };
 
 export default function PricingPage() {

@@ -19,7 +19,7 @@ const Logo = () => {
           <Dot />
         </span>
       </div>
-      <span className="font-semibold text-base text-white">Falah Motors</span>
+      <span className="font-semibold text-base text-white">AHM Auto</span>
     </Link>
   );
 };

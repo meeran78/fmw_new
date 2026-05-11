@@ -172,7 +172,7 @@ const AddListing = () => {
                         Add Photo
                       </h2>
                       <div className="text-sm text-[#6c8ea0]">
-                        <div>Add at least 3 photos for this listing</div>
+                        <div>Add at least 10 photos for this listing</div>
                         First picture - is the title picture.
                       </div>
                     </div>

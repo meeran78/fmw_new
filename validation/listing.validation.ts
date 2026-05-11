@@ -64,7 +64,7 @@ export const listingSchema = z.object({
   seatingCapacity: z.string().optional(),
   description: z.string().optional(),
   price: z.number().min(1, "Price is required"),
-  imageUrls: z.array(z.string()).min(3, "At least 3 images required"),
+  imageUrls: z.array(z.string()).min(3, "At least  images required"),
 });
 
 export const listingBackendSchema = listingSchema.extend({

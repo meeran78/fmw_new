@@ -11,9 +11,9 @@ import {
 } from "@/components/ui/card";
 
 export const metadata: Metadata = {
-  title: "Services & Repair | Falah Motors",
+  title: "Services & Repair | AHM Auto",
   description:
-    "Vehicle servicing and repair — coming soon at Falah Motors.",
+    "Vehicle servicing and repair — coming soon at AHM Auto.",
 };
 
 export default function ServicesRepairPage() {

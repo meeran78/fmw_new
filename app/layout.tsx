@@ -9,8 +9,8 @@ import { Suspense } from "react";
 import FallbackLoader from "@/components/loader/fallbackLoader";
 
 export const metadata: Metadata = {
-  title: "Falah Motors",
-  description: "Falah Motors is a car dealership that sells new and used cars.",
+  title: "AHM Auto",
+  description: "AHM Auto is a car dealership that sells new and used cars in the DMV area.",
   icons: {
     icon: "/favicon.ico",
   },
